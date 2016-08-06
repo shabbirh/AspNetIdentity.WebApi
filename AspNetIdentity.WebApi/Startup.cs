@@ -49,8 +49,10 @@ namespace AspNetIdentity.WebApi
                 TokenEndpointPath = new PathString("/oauth/token"),
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
                 Provider = new CustomOAuthProvider(),
-                AccessTokenFormat = new CustomJwtFormat("http://localhost:59822")
+                AccessTokenFormat = new CustomJwtFormat("http://localhost:59822"),
+                RefreshTokenProvider = new SimpleRefreshTokenProvider()
             };
+            
 
             // OAuth 2.0 Bearer Access Token Generation
             app.UseOAuthAuthorizationServer(OAuthServerOptions);

@@ -1,8 +1,13 @@
+using System.Collections.Generic;
+using AspNetIdentity.WebApi.Entities;
+using AspNetIdentity.WebApi.Enums;
+using AspNetIdentity.WebApi.Helpers;
+using AspNetIdentity.WebApi.Infrastructure;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+
 namespace AspNetIdentity.WebApi.Migrations
 {
-    using AspNetIdentity.WebApi.Infrastructure;
-    using Microsoft.AspNet.Identity;
-    using Microsoft.AspNet.Identity.EntityFramework;
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
@@ -12,40 +17,76 @@ namespace AspNetIdentity.WebApi.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
         }
 
-        protected override void Seed(AspNetIdentity.WebApi.Infrastructure.ApplicationDbContext context)
+        protected override void Seed(ApplicationDbContext context)
         {
             //  This method will be called after migrating to the latest version.
 
             var manager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
-            
+
             var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
 
             var user = new ApplicationUser()
             {
-                UserName = "SuperPowerUser",
-                Email = "taiseer.joudeh@gmail.com",
+                UserName = "Admin",
+                Email = "shabbir@hassanally.net",
                 EmailConfirmed = true,
-                FirstName = "Taiseer",
-                LastName = "Joudeh",
+                FirstName = "Shabbir",
+                LastName = "Hassanally",
                 Level = 1,
                 JoinDate = DateTime.Now.AddYears(-3)
             };
 
-            manager.Create(user, "MySuperP@ss!");
+            manager.Create(user, "Password1!");
 
             if (roleManager.Roles.Count() == 0)
             {
                 roleManager.Create(new IdentityRole { Name = "SuperAdmin" });
-                roleManager.Create(new IdentityRole { Name = "Admin"});
-                roleManager.Create(new IdentityRole { Name = "User"});
+                roleManager.Create(new IdentityRole { Name = "Admin" });
+                roleManager.Create(new IdentityRole { Name = "User" });
             }
 
-            var adminUser = manager.FindByName("SuperPowerUser");
+            var adminUser = manager.FindByName("Admin");
 
             manager.AddToRoles(adminUser.Id, new string[] { "SuperAdmin", "Admin" });
+
+            if (context.Clients.Count() > 0)
+            {
+                return;
+            }
+
+            context.Clients.AddRange(BuildClientsList());
+            context.SaveChanges();
+        }
+
+        private static List<Client> BuildClientsList()
+        {
+
+            List<Client> ClientsList = new List<Client>
+            {
+                new Client
+                { Id = "ngAuthApp",
+                    Secret= HashingHelper.GetHash("abc@123"),
+                    Name="AngularJS front-end Application",
+                    ApplicationType =  ApplicationTypes.JavaScript,
+                    Active = true,
+                    RefreshTokenLifeTime = 7200,
+                    AllowedOrigin = "*"
+                },
+                new Client
+                { Id = "consoleApp",
+                    Secret=HashingHelper.GetHash("123@abc"),
+                    Name="Console Application",
+                    ApplicationType = ApplicationTypes.NativeConfidential,
+                    Active = true,
+                    RefreshTokenLifeTime = 14400,
+                    AllowedOrigin = "*"
+                }
+            };
+
+            return ClientsList;
         }
     }
 }
