@@ -31,15 +31,15 @@ namespace AspNetIdentity.WebApi.Migrations
             var user = new ApplicationUser()
             {
                 UserName = "Admin",
-                Email = "shabbir@hassanally.net",
+                Email = "someone@somewhere.else",
                 EmailConfirmed = true,
-                FirstName = "Shabbir",
-                LastName = "Hassanally",
+                FirstName = "John",
+                LastName = "Doe",
                 Level = 1,
                 JoinDate = DateTime.Now.AddYears(-3)
             };
 
-            manager.Create(user, "Password1!");
+            manager.Create(user, "MegaSecureP@55w0rd!");
 
             if (roleManager.Roles.Count() == 0)
             {
